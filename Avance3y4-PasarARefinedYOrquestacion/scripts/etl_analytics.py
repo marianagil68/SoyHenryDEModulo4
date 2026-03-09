@@ -53,5 +53,3 @@ def main():
         spark.stop()
 if __name__ == "__main__":
     main()
-
-# Prueba de CI CD para el Avance 4.
