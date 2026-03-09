@@ -1,6 +1,6 @@
 import sys
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, when, round
+from pyspark.sql.functions import col, when, round, from_unixtime, hour
 
 def main():
     spark = SparkSession.builder \
@@ -34,6 +34,10 @@ def main():
         except Exception:
             print(">>> No se encontraron datos de streaming o la carpeta no existe aún. Usando solo Batch.")
             df_unified = df_batch
+        
+        print(">>> Extrayendo hora para cálculos...")
+        # Derivamos la columna 'hora' a partir del timestamp (dt) si no existe
+        df_unified = df_unified.withColumn("hora", hour(from_unixtime(col("dt"))))
         
         print(">>> Calculando lógicas de negocio (Potencial Solar y Eólico)...")
         
