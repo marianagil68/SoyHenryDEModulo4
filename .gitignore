@@ -1,0 +1,15 @@
+# Ignorar archivos temporales, documentos y claves SSH
+*.docx
+*.txt
+*.csv
+*.pem
+
+# Ignorar ambientes virtuales o cachés
+__pycache__/
+.venv/
+venv/
+.env
+
+# Ignorar archivos del SO
+.DS_Store
+Thumbs.db
