@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'Avance3y4-PasarARefinedYOrquestacion/scripts/**'
+      - 'Avance5-Kafka/scripts/**'
 
 jobs:
   deploy:
@@ -25,7 +26,8 @@ jobs:
     - name: Sync scripts to EC2
       run: |
         scp -r ./Avance3y4-PasarARefinedYOrquestacion/scripts/*.py ec2-user@${{ secrets.EC2_HOST }}:/home/ec2-user/
+        scp -r ./Avance5-Kafka/scripts/*.py ec2-user@${{ secrets.EC2_HOST }}:/home/ec2-user/
         
     - name: Copy scripts into Spark Container
       run: |
-        ssh ec2-user@${{ secrets.EC2_HOST }} "docker cp /home/ec2-user/etl_weather_s3.py spark-master:/opt/spark/etl_weather_s3.py && docker cp /home/ec2-user/etl_analytics.py spark-master:/opt/spark/etl_analytics.py"
+        ssh ec2-user@${{ secrets.EC2_HOST }} "docker cp /home/ec2-user/etl_weather_s3.py spark-master:/opt/spark/etl_weather_s3.py && docker cp /home/ec2-user/etl_analytics.py spark-master:/opt/spark/etl_analytics.py && docker cp /home/ec2-user/etl_streaming_raw.py spark-master:/opt/spark/etl_streaming_raw.py && docker cp /home/ec2-user/etl_streaming_processed.py spark-master:/opt/spark/etl_streaming_processed.py && docker cp /home/ec2-user/etl_analytics_gold_unified.py spark-master:/opt/spark/etl_analytics_gold_unified.py"
