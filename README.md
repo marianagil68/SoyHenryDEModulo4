@@ -8,7 +8,9 @@ El ciclo de vida del dato se encuentra modularizado en diferentes fases de ingen
 
 ## 🎯 Topología y Documentación del Proyecto
 
-El despliegue de esta arquitectura de datos se dividió en hitos técnicos estratégicos. Puede explorar la documentación de implementación detallada y el código fuente de cada fase ingresando a los siguientes enlaces:
+El despliegue de esta arquitectura de datos se dividió en hitos técnicos estratégicos. Para facilitar la lectura y el gobierno de la información, **cada fase (o avance de la cursada) contiene su propio documento técnico detallado (`README.md`) dentro de su respectiva subcarpeta `docs/`**. 
+
+Puede explorar la documentación de implementación detallada y el código fuente de cada fase ingresando a los siguientes enlaces:
 
 ### 🚀 [Fase 1: Diseño Conceptual y Arquitectura en la Nube](./Avance1-DiseñoDeArquitectura/)
 Definición estructural y modelado del ciclo de vida del dato.
