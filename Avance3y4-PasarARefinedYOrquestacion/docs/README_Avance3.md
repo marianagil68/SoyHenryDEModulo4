@@ -151,3 +151,46 @@ La estructura del Data Lake queda lista para el paso de visualización y Analyti
 - Docker
 - Amazon Web Services (EC2, IAM, S3)
 - Python
+- GitHub Actions (CI/CD)
+
+---
+
+# Proyecto Integrador – Avance 4
+## Capa Analytics (Gold) y CI/CD
+
+En este último avance unificado, expandimos el alcance del pipeline original para cumplir con los requerimientos analíticos y de integración continua pautados para el final del módulo.
+
+### 1. Transformación hacia la Capa Gold (Analytics)
+Se creó un nuevo script en PySpark (`etl_analytics.py`) encargado de consumir la capa Refined y responder a las preguntas de negocio estructurales. 
+Dicho script incorpora la velocidad del viento (`wind_speed`) y la medición de nubosidad (`clouds`) agregadas previamente para formular heurísticas de:
+- **Potencial Solar:** Calculado en horas diurnas (7-18hs), premiando altas temperaturas y penalizando altos índices de nubosidad.
+- **Potencial Eólico:** Calculado linealmente a partir de la velocidad neta del viento originada en cada ciudad.
+
+El resultado consolida la limpieza de fechas (`timestamp UNIX` a Fecha/Hora legible) y se almacena en el **Data Lake** (`analytics/energy_potential/`) particionado por ciudad en formato Parquet, exportando adicionalmente a un archivo unificado `.csv` para facilitar inspecciones del cliente.
+![DatosCSV](img/11.2-DatosCSV.jpg)
+
+### 2. Orquestación Secuencial en Airflow
+El DAG `spark_remote_etl.py` fue modificado para invocar en cascada los procesos de procesamiento (Refined -> Analytics) usando `SSHOperator`. 
+Adicionalmente, se deshabilitó la recopilación de logs en la base de datos de Airflow (`do_xcom_push=False`) con el fin de evitar desbordamientos de memoria RAM (*OOM / SIGTERM*) experimentados al orquestar desde instancias de nivel gratuito `t3.small` hacia servidores Spark de bajos recursos.
+
+![DAG Completo Secuencial en Airflow UI](img/11-AirflowAnalytics.jpg)
+
+### 3. Integración y Despliegue Continuo (CI/CD)
+Se automatizó la actualización del código Python sobre la máquina EC2 albergando Spark a través de flujos en la nube mediante un pipeline de **GitHub Actions** (`deploy-spark.yml`):
+1. **Event Trigger:** Se dispara ante cada `git push` a la rama `main` que detecte cambios en la capeta de `scripts/`.
+2. **Setup Seguro:** Conexión estricta a través del grupo de seguridad de AWS empleando llaves inyectadas vía *GitHub Repository Secrets* (`EC2_HOST` y `EC2_SSH_KEY`). 
+3. **Despliegue Interno:** Copiado recursivo del código fuente hacia el subsistema de Amazon Linux y posterior inyección en caliente dentro del volumen local del contenedor activo `spark-master` mediante `docker cp`.
+
+![Ejecución Exitosa CI/CD en GitHub](img/12-CiCd.jpg)
+
+### 4. Presentación y Dashboard Interactivo 
+Para dar cierre al ciclo de Ingeniería de Datos y responder  a las **preguntas de negocio** planteadas en la consigna, se conectó localmente la Capa Gold consolidada (Archivos `.csv`) hacia un entorno de **Jupyter Notebook**.
+Mediante los módulos de visualización (`pandas`, `matplotlib`, `seaborn`) se graficaron y calcularon las siguientes heurísticas derivadas del Data Lake:
+- Curva de distribución promedio del Potencial Solar por franja horaria.
+- Análisis de la estacionalidad diaria del Potencial Eólico (Velocidad de viento sostenida).
+- Impacto negativo probabilístico de la nubosidad en la captación térmica.
+- Fechas Históricas Pico (Mayor radiación en Patagonia y Riohacha / Menor propulsión eólica global).
+
+El código fuente de los gráficos se encuentra adjunto en el documento `notebooks/Respuestas_Negocio.ipynb`.
+
+![Visualización en Jupyter Notebook](img/13-PreguntasDeNegocio.jpg)

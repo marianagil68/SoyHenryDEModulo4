@@ -21,6 +21,7 @@ with DAG(
         task_id='spark_raw_to_refined',
         ssh_conn_id='spark_ec2_ssh',
         cmd_timeout=600,
+        do_xcom_push=False,
         command="""
         docker exec spark-master /opt/spark/bin/spark-submit \
             --master spark://spark-master:7077 \
@@ -38,6 +39,7 @@ with DAG(
         task_id='spark_refined_to_gold',
         ssh_conn_id='spark_ec2_ssh',
         cmd_timeout=600,
+        do_xcom_push=False,
         command="""
         docker exec spark-master /opt/spark/bin/spark-submit \
             --master spark://spark-master:7077 \
